@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Teleportable : MonoBehaviour
 {
-    private bool isTouchingPortal = false;
+    private bool isTouchingPortal = false, currentSide;
     private GameObject portal;
     private Portal portalComponent;
 
@@ -22,32 +22,31 @@ public class Teleportable : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isTouchingPortal && portalComponent.GetSide(gameObject.transform.position))
+        if (isTouchingPortal && currentSide != portalComponent.GetSide(gameObject.transform.position))
             portalComponent.TeleportObject(gameObject);
     }
 
     void OnTriggerEnter(Collider other)
     {
-        GameObject portalObject = other.gameObject;
-        if (portalObject.layer == 11 && !portalObject.GetComponent<Portal>().GetSide(gameObject.transform.position))
-            setPortal(portalObject);
+        if (other.gameObject.layer == LayerMask.NameToLayer("Teleporters"))
+            SetPortal(other.gameObject);
     }
 
     void OnTriggerExit(Collider other)
     {
-        GameObject portalObject = other.gameObject;
-        if (portalObject.layer == 11 && portalObject == portal)
-            unSetPortal();
+        if (other.gameObject.layer == LayerMask.NameToLayer("Teleporters") && other.gameObject == portal)
+            UnSetPortal();
     }
 
-    void setPortal(GameObject portalObject)
+    void SetPortal(GameObject portalObject)
     {
+        currentSide = portalObject.GetComponent<Portal>().GetSide(gameObject.transform.position);
         isTouchingPortal = true;
         portal = portalObject;
         portalComponent = portal.GetComponent<Portal>();
     }
 
-    public void unSetPortal()
+    public void UnSetPortal()
     {
         isTouchingPortal = false;
         portal = null;

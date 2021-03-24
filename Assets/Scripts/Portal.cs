@@ -8,12 +8,14 @@ public class Portal : MonoBehaviour
     private GameObject portalCamera;
     private Plane portalPlane;
     private Camera playerCamera;
+    private bool isRendering = true;
 
     private void Awake()
     {
+        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, (float)(5 * transform.localScale.z / transform.lossyScale.z));
         portalPlane = new Plane(-gameObject.transform.forward, gameObject.transform.position);
         portalCamera = transform.Find("Portal Camera").gameObject;
-        playerCamera = GetPlayerCamera();
+        playerCamera = Camera.main;
         RenderTexture cameraTexture = new RenderTexture(Screen.width, Screen.height, 24);
         portalCamera.GetComponent<Camera>().targetTexture = cameraTexture;
         portalCamera.GetComponent<Camera>().cullingMask -= 1 << LayerMask.NameToLayer("Teleporters");
@@ -38,16 +40,6 @@ public class Portal : MonoBehaviour
         portalCamera.transform.rotation = Quaternion.LookRotation(newCameraDirection, Vector3.up);
     }
 
-    public Camera GetPlayerCamera()
-    {
-        Camera playerCameraVar = null;
-        var allCameras = Camera.allCameras;
-        for (var i = 0; i < allCameras.Length; i++)
-            if (allCameras[i].gameObject.layer == LayerMask.NameToLayer("Player"))
-                playerCameraVar = allCameras[i];
-        return playerCameraVar;
-    }
-
     public bool GetSide(Vector3 point)
     {
         if (portalPlane.GetSide(point))
@@ -57,7 +49,15 @@ public class Portal : MonoBehaviour
 
     public void TeleportObject(GameObject other)
     {
+        portalEnd.GetComponent<Portal>().SetRender(false);
         other.transform.position += portalEnd.transform.position - gameObject.transform.position;
-        other.GetComponent<Teleportable>().unSetPortal();
+        other.GetComponent<Teleportable>().UnSetPortal();
+    }
+
+    public void SetRender(bool mode)
+    {
+        GetComponent<MeshRenderer>().enabled = mode;
+        portalCamera.SetActive(mode);
+        isRendering = mode;
     }
 }
