@@ -35,7 +35,10 @@ public class Teleportable : MonoBehaviour
     void OnTriggerExit(Collider other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Teleporters") && other.gameObject == portal)
+        {
+            portalComponent.SetRender(true);
             UnSetPortal();
+        }
     }
 
     void SetPortal(GameObject portalObject)

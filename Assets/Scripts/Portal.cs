@@ -12,7 +12,7 @@ public class Portal : MonoBehaviour
 
     private void Awake()
     {
-        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, (float)(5 * transform.localScale.z / transform.lossyScale.z));
+        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, (float)(1 * transform.localScale.z / transform.lossyScale.z));
         portalPlane = new Plane(-gameObject.transform.forward, gameObject.transform.position);
         portalCamera = transform.Find("Portal Camera").gameObject;
         playerCamera = Camera.main;
