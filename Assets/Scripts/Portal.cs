@@ -12,7 +12,6 @@ public class Portal : MonoBehaviour
 
     private void Awake()
     {
-        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, (float)(1 * transform.localScale.z / transform.lossyScale.z));
         portalPlane = new Plane(-gameObject.transform.forward, gameObject.transform.position);
         portalCamera = transform.Find("Portal Camera").gameObject;
         playerCamera = Camera.main;
@@ -31,7 +30,7 @@ public class Portal : MonoBehaviour
     }
 
     // Update is called once per frame
-    private void Update()
+    public void Render()
     {
         portalCamera.transform.position = portalEnd.transform.position + playerCamera.transform.position - transform.position;
         float angularDifferenceBetweenPortalRotations = Quaternion.Angle(transform.rotation, portalEnd.transform.rotation);
