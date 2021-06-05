@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Portal : MonoBehaviour
 {
-    public GameObject portalEnd;
-    private GameObject portalCamera;
+    public Portal linkedPortal;
+    private Camera portalCamera;
     private Plane portalPlane;
     private Camera playerCamera;
     private bool isRendering = true;
@@ -13,30 +13,27 @@ public class Portal : MonoBehaviour
     private void Awake()
     {
         portalPlane = new Plane(-gameObject.transform.forward, gameObject.transform.position);
-        portalCamera = transform.Find("Portal Camera").gameObject;
+        portalCamera = GetComponentInChildren<Camera>();
+        portalCamera.enabled = false;
         playerCamera = Camera.main;
         RenderTexture cameraTexture = new RenderTexture(Screen.width, Screen.height, 24);
-        portalCamera.GetComponent<Camera>().targetTexture = cameraTexture;
-        portalCamera.GetComponent<Camera>().cullingMask -= 1 << LayerMask.NameToLayer("Teleporters");
+        portalCamera.targetTexture = cameraTexture;
+        portalCamera.cullingMask -= 1 << LayerMask.NameToLayer("Teleporters");
         Material renderMaterial = new Material(Shader.Find("Unlit/ScreenCutoutShader"));
         renderMaterial.mainTexture = cameraTexture;
         GetComponent<MeshRenderer>().material = renderMaterial;
     }
 
-    //Start is called before the first frame update
-    private void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     public void Render()
     {
-        portalCamera.transform.position = portalEnd.transform.position + playerCamera.transform.position - transform.position;
-        float angularDifferenceBetweenPortalRotations = Quaternion.Angle(transform.rotation, portalEnd.transform.rotation);
-        Quaternion portalRotationalDifference = Quaternion.AngleAxis(angularDifferenceBetweenPortalRotations, Vector3.up);
-        Vector3 newCameraDirection = portalRotationalDifference * playerCamera.transform.forward;
-        portalCamera.transform.rotation = Quaternion.LookRotation(newCameraDirection, Vector3.up);
+        Matrix4x4 newPortalCameraMatrix = linkedPortal.transform.localToWorldMatrix * transform.worldToLocalMatrix * playerCamera.transform.localToWorldMatrix;
+        portalCamera.transform.SetPositionAndRotation(newPortalCameraMatrix.GetColumn(3), newPortalCameraMatrix.rotation);
+        Plane cameraPlane = new Plane(-playerCamera.transform.forward, playerCamera.transform.position);
+        if (GetComponent<BoxCollider>().bounds.Contains(playerCamera.transform.position) && cameraPlane.GetSide(transform.position))
+            SetRender(false);
+        else
+            SetRender(true);
     }
 
     public bool GetSide(Vector3 point)
@@ -48,15 +45,14 @@ public class Portal : MonoBehaviour
 
     public void TeleportObject(GameObject other)
     {
-        portalEnd.GetComponent<Portal>().SetRender(false);
-        other.transform.position += portalEnd.transform.position - gameObject.transform.position;
+        other.transform.position += linkedPortal.transform.position - gameObject.transform.position;
         other.GetComponent<Teleportable>().UnSetPortal();
     }
 
     public void SetRender(bool mode)
     {
         GetComponent<MeshRenderer>().enabled = mode;
-        portalCamera.SetActive(mode);
+        portalCamera.enabled = mode;
         isRendering = mode;
     }
 }

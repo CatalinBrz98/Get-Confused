@@ -4,39 +4,41 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField]
+    public float speed = 12f, gravity = 19.62f, jumpForce = 125f;
     private CharacterController controller;
-    [SerializeField]
-    private float speed = 12f, gravity = 9.81f, groundDistance = 0.4f, jumpForce = 0.05f;
-    [SerializeField]
-    private Transform groundCheck;
-    [SerializeField]
-    private LayerMask groundMask;
-    Vector3 velocity;
-    bool isGrounded;
+    private Vector3 velocity;
+    private bool isGrounded;
+    private bool isJumping = false;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
+        controller = GetComponent<CharacterController>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        if (Input.GetButtonDown("Jump") && isGrounded)
+            isJumping = true;
+    }
+
+    void FixedUpdate()
+    {
+        isGrounded = (controller.collisionFlags & CollisionFlags.Below) != 0;
         if (isGrounded && velocity.y < 0)
             velocity.y = 0f;
 
         float xMovement = Input.GetAxis("Horizontal");
         float zMovement = Input.GetAxis("Vertical");
         Vector3 movement = transform.right * xMovement + transform.forward * zMovement;
-        controller.Move(movement * speed * Time.deltaTime);
+        controller.Move(movement * speed * Time.fixedDeltaTime);
 
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (isJumping)
+        {
             velocity.y = Mathf.Sqrt(jumpForce * gravity / 50000f);
+            isJumping = false;
+        }
 
-        velocity.y -= gravity * Time.deltaTime * Time.deltaTime;
+        velocity.y -= gravity * Time.deltaTime * Time.fixedDeltaTime;
         controller.Move(velocity);
     }
 }
