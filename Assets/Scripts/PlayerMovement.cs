@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float speed = 12f, gravity = 19.62f, jumpForce = 125f;
+    [SerializeField]
+    private float speed = 12f, gravity = 19.62f, jumpForce = 125f;
     private CharacterController controller;
     private Vector3 velocity;
     private bool isGrounded;

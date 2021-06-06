@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Portal : MonoBehaviour
 {
-    public Portal linkedPortal;
+    [SerializeField]
+    private Portal linkedPortal;
     private Camera portalCamera;
     private Plane portalPlane;
     private Camera playerCamera;
@@ -27,10 +28,12 @@ public class Portal : MonoBehaviour
     // Update is called once per frame
     public void Render()
     {
+        if (!isRendering)
+            return;
         Matrix4x4 newPortalCameraMatrix = linkedPortal.transform.localToWorldMatrix * transform.worldToLocalMatrix * playerCamera.transform.localToWorldMatrix;
         portalCamera.transform.SetPositionAndRotation(newPortalCameraMatrix.GetColumn(3), newPortalCameraMatrix.rotation);
-        Plane cameraPlane = new Plane(-playerCamera.transform.forward, playerCamera.transform.position);
-        if (GetComponent<BoxCollider>().bounds.Contains(playerCamera.transform.position) && cameraPlane.GetSide(transform.position))
+        Ray cameraRay = playerCamera.ScreenPointToRay(Input.mousePosition);
+        if (GetComponent<BoxCollider>().bounds.Contains(playerCamera.transform.position) && !portalPlane.Raycast(cameraRay, out float enter))
             SetRender(false);
         else
             SetRender(true);
@@ -38,15 +41,15 @@ public class Portal : MonoBehaviour
 
     public bool GetSide(Vector3 point)
     {
-        if (portalPlane.GetSide(point))
-            return false;
-        return true;
+        return !portalPlane.GetSide(point);
     }
 
     public void TeleportObject(GameObject other)
     {
-        other.transform.position += linkedPortal.transform.position - gameObject.transform.position;
+        Matrix4x4 newPortalCameraMatrix = linkedPortal.transform.localToWorldMatrix * transform.worldToLocalMatrix * other.transform.localToWorldMatrix;
+        other.transform.SetPositionAndRotation(newPortalCameraMatrix.GetColumn(3), newPortalCameraMatrix.rotation);
         other.GetComponent<Teleportable>().UnSetPortal();
+        linkedPortal.Render();
     }
 
     public void SetRender(bool mode)
@@ -54,5 +57,7 @@ public class Portal : MonoBehaviour
         GetComponent<MeshRenderer>().enabled = mode;
         portalCamera.enabled = mode;
         isRendering = mode;
+        if (mode)
+            portalCamera.Render();
     }
 }

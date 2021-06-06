@@ -8,19 +8,7 @@ public class Teleportable : MonoBehaviour
     private GameObject portal;
     private Portal portalComponent;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    void FixedUpdate()
+    void LateUpdate()
     {
         if (isTouchingPortal && currentSide != portalComponent.GetSide(gameObject.transform.position))
             portalComponent.TeleportObject(gameObject);
@@ -43,10 +31,10 @@ public class Teleportable : MonoBehaviour
 
     void SetPortal(GameObject portalObject)
     {
-        currentSide = portalObject.GetComponent<Portal>().GetSide(gameObject.transform.position);
         isTouchingPortal = true;
         portal = portalObject;
         portalComponent = portal.GetComponent<Portal>();
+        currentSide = portalComponent.GetSide(gameObject.transform.position);
     }
 
     public void UnSetPortal()

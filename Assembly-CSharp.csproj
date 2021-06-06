@@ -62,7 +62,7 @@
     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
   </ItemGroup>
   <ItemGroup>
-     <None Include="Assets\Scripts\ScreenCutoutShader.shader" />
+     <None Include="Assets\Scripts\Shaders\ScreenCutoutShader.shader" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2021.1.7f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
