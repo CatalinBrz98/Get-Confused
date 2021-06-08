@@ -163,15 +163,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63b961a341ea2d84086833ddd1f81782, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 6369688600160390521}
   speed: 12
   gravity: 19.62
-  groundDistance: 0.4
-  jumpForce: 10
-  groundCheck: {fileID: 0}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 1536
+  jumpForce: 0
 --- !u!114 &6369688600160390526
 MonoBehaviour:
   m_ObjectHideFlags: 0

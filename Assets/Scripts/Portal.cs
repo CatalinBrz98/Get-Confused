@@ -25,11 +25,8 @@ public class Portal : MonoBehaviour
         GetComponent<MeshRenderer>().material = renderMaterial;
     }
 
-    // Update is called once per frame
     public void Render()
     {
-        if (!isRendering)
-            return;
         Matrix4x4 newPortalCameraMatrix = linkedPortal.transform.localToWorldMatrix * transform.worldToLocalMatrix * playerCamera.transform.localToWorldMatrix;
         portalCamera.transform.SetPositionAndRotation(newPortalCameraMatrix.GetColumn(3), newPortalCameraMatrix.rotation);
         Ray cameraRay = playerCamera.ScreenPointToRay(Input.mousePosition);
@@ -46,8 +43,8 @@ public class Portal : MonoBehaviour
 
     public void TeleportObject(GameObject other)
     {
-        Matrix4x4 newPortalCameraMatrix = linkedPortal.transform.localToWorldMatrix * transform.worldToLocalMatrix * other.transform.localToWorldMatrix;
-        other.transform.SetPositionAndRotation(newPortalCameraMatrix.GetColumn(3), newPortalCameraMatrix.rotation);
+        Matrix4x4 newTeleportableMatrix = linkedPortal.transform.localToWorldMatrix * transform.worldToLocalMatrix * other.transform.localToWorldMatrix;
+        other.transform.SetPositionAndRotation(newTeleportableMatrix.GetColumn(3), newTeleportableMatrix.rotation);
         other.GetComponent<Teleportable>().UnSetPortal();
         linkedPortal.Render();
     }
